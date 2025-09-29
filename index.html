@@ -2,7 +2,7 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8" />
-  <title>forid0k</title>
+  <title>Prediction Signal Panel</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
@@ -26,7 +26,7 @@
       text-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
 
-    /* Container for period and signal stacked vertically */
+    /* Container for signal only */
     #predictionBox {
       margin-top: 20px;
       background: rgba(255, 255, 255, 0.15);
@@ -34,7 +34,7 @@
       padding: 25px 20px;
       box-shadow: inset 0 0 15px rgba(255,255,255,0.2);
       user-select: none;
-      min-height: 110px;
+      min-height: 80px;
       text-align: center;
       position: relative;
       color: #fff;
@@ -42,20 +42,17 @@
       letter-spacing: 0.05em;
     }
 
-    #predictionPeriod {
-      font-size: 2rem; /* ফন্ট সাইজ ছোট করা হয়েছে */
+    /* #predictionPeriod {
+      font-size: 3.2rem;
       font-weight: 700;
       color: #ffd700;
       text-shadow: 0 0 12px #ffd700;
       margin-bottom: 10px;
       user-select: text;
-      word-wrap: break-word;
-      max-width: 100%;
-      overflow-wrap: break-word;
-    }
+    } */
 
     #predictionSignal {
-      font-size: 2.2rem;
+      font-size: 3rem;
       font-weight: 700;
       color: #00e676;
       text-shadow: 0 0 10px #00e676;
@@ -63,7 +60,6 @@
     }
 
     /* Hide predictionBox content when not active */
-    #predictionBox.hidden #predictionPeriod,
     #predictionBox.hidden #predictionSignal {
       opacity: 0;
       transition: opacity 0.5s ease;
@@ -157,16 +153,16 @@
 </head>
 <body>
 
-  <h2>Color Zone</h2>
+  <h2>Prediction Signal</h2>
 
   <div id="predictionBox" class="hidden">
-    
+    <!-- প্রেডিকশন নাম্বার ডিভ সরানো হয়েছে -->
     <div id="predictionSignal">-</div>
   </div>
 
-  <button id="generateBtn">Signal</button>
+  <button id="generateBtn">Generate Signal</button>
 
-  <h2 class="history-title">Latest History</h2>
+  <h2 class="history-title">Latest History (Last 4 Results)</h2>
   <table id="historyTable">
     <thead>
       <tr>
@@ -184,7 +180,7 @@
     const API_URL = 'https://draw.ar-lottery01.com/WinGo/WinGo_30S/GetHistoryIssuePage.json';
 
     let historyData = [];
-    let prediction = { signal: null, period: null };
+    let prediction = { signal: null };
     let hideTimeout = null;
 
     async function fetchHistory() {
@@ -227,28 +223,26 @@
 
       const signal = avg > 5 ? 'BIG' : 'SMALL';
 
-      const latestPeriod = Number(historyData[0].issueNumber);
-      const predictionPeriod = latestPeriod + 1;
-
-      prediction = { signal, period: predictionPeriod };
+      prediction = { signal };
     }
 
     function showPrediction() {
       const box = document.getElementById('predictionBox');
-      const periodDiv = document.getElementById('predictionPeriod');
       const signalDiv = document.getElementById('predictionSignal');
 
-      periodDiv.textContent = prediction.period || '-';
       signalDiv.textContent = prediction.signal || '-';
 
       box.classList.remove('hidden');
 
       if (hideTimeout) clearTimeout(hideTimeout);
+
+      // BIG হলে 2 সেকেন্ড, SMALL হলে 2 সেকেন্ড দেখাবে
+      const displayTime = (prediction.signal === 'BIG') ? 2000 : 2000;
+
       hideTimeout = setTimeout(() => {
         box.classList.add('hidden');
-        periodDiv.textContent = '-';
         signalDiv.textContent = '-';
-      }, 5000);
+      }, displayTime);
     }
 
     document.getElementById('generateBtn').addEventListener('click', () => {
